@@ -174,83 +174,84 @@ async function loadVaultItems() {
 
 // Display vault items safely
 function displayVaultItems(items) {
-    const vaultItemsContainer = document.getElementById('vaultItems');
-    const itemsCount = document.getElementById('itemsCount');
-    
-    if (!vaultItemsContainer) {
-        console.error('❌ vaultItems container not found');
-        return;
-    }
+  const vaultItemsContainer = document.getElementById('vaultItems');
+  const itemsCount = document.getElementById('itemsCount');
 
-    // Update items count if element exists
-    if (itemsCount) {
-        itemsCount.textContent = `${items.length} document${items.length !== 1 ? 's' : ''}`;
-    }
+  if (!vaultItemsContainer) return;
 
-    if (items.length === 0) {
-        vaultItemsContainer.innerHTML = `
-            <div class="text-center py-4">
-                <div class="text-muted">No documents uploaded yet.</div>
-                <small class="text-muted">Upload your first property grant to get started!</small>
-            </div>
-        `;
-        return;
-    }
+  // Update count
+  if (itemsCount) {
+    itemsCount.textContent = `${items.length} document${items.length !== 1 ? 's' : ''}`;
+  }
+
+  if (items.length === 0) {
+    vaultItemsContainer.innerHTML = `
+      <div class="text-center py-4">
+        <div class="text-muted">No documents uploaded yet.</div>
+        <small class="text-muted">Upload your first property grant to get started!</small>
+      </div>
+    `;
+    return;
+  }
 
     // Safely create HTML content
-    vaultItemsContainer.innerHTML = items.map(item => `
-        <div class="card mb-3 vault-item">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="flex-grow-1">
-                        <h6 class="card-title d-flex align-items-center">
-                            <i class="bi bi-file-earmark-${item.fileType?.includes('pdf') ? 'pdf' : 'image'} me-2"></i>
-                            ${item.originalName || item.name}
-                        </h6>
-                        <p class="card-text mb-1">
-                            <small class="text-muted">
-                                <i class="bi bi-calendar me-1"></i>
-                                Uploaded: ${new Date(item.createdAt).toLocaleDateString()}
-                            </small>
-                        </p>
-                        <p class="card-text mb-2">
-                            <small class="text-muted">
-                                <i class="bi bi-hdd me-1"></i>
-                                Size: ${formatFileSize(item.fileSize || item.size)}
-                            </small>
-                        </p>
-                        <div class="d-flex align-items-center">
-                            <span class="badge status-badge bg-${getStatusColor(item.ocrStatus)} me-2">
-                                ${item.ocrStatus || 'completed'}
-                            </span>
-                            ${item.isProcessed ? '<span class="badge status-badge bg-success">Processed</span>' : ''}
-                        </div>
-                    </div>
-                    <div class="btn-group">
-                        ${item.extractedText ? `
-                            <button class="btn btn-sm btn-outline-primary view-text" 
-                                    data-text="${escapeHtml(item.extractedText)}" 
-                                    data-filename="${item.originalName}">
-                                <i class="bi bi-eye me-1"></i>View Text
-                            </button>
-                        ` : ''}
-                    </div>
+   // Create grid of cards
+  vaultItemsContainer.innerHTML = `
+    <div class="row g-3">
+      ${items.map(item => `
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm vault-item border-0">
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex align-items-start mb-2">
+                <i class="bi bi-file-earmark-${item.fileType?.includes('pdf') ? 'pdf text-danger' : 'image text-primary'} fs-3 me-2"></i>
+                <div>
+                  <h6 class="mb-1">${item.originalName || item.name}</h6>
+                  <small class="text-muted">
+                    <i class="bi bi-calendar me-1"></i>
+                    ${new Date(item.createdAt).toLocaleDateString()}
+                  </small>
                 </div>
-            </div>
-        </div>
-    `).join('');
+              </div>
 
-    // Add event listeners safely
-    setTimeout(() => {
-        const viewButtons = vaultItemsContainer.querySelectorAll('.view-text');
-        viewButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const text = button.getAttribute('data-text');
-                const filename = button.getAttribute('data-filename');
-                alert(`Extracted text from ${filename}:\n\n${text}`);
-            });
-        });
-    }, 100);
+              <div class="mt-auto">
+                <div class="mb-2">
+                  <span class="badge rounded-pill bg-${getStatusColor(item.ocrStatus)} me-1">
+                    ${item.ocrStatus || 'completed'}
+                  </span>
+                  ${item.isProcessed ? `<span class="badge rounded-pill bg-success">Processed</span>` : ''}
+                </div>
+                <div class="d-flex gap-2">
+                  ${item.extractedText ? `
+                    <button class="btn btn-sm btn-outline-primary flex-grow-1 view-text"
+                            data-text="${escapeHtml(item.extractedText)}" 
+                            data-filename="${item.originalName}">
+                      <i class="bi bi-eye me-1"></i>View
+                    </button>
+                  ` : ''}
+                  <a href="${item.fileUrl || '#'}" target="_blank" class="btn btn-sm btn-outline-secondary flex-grow-1">
+                    <i class="bi bi-download me-1"></i>Download
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+
+  // Attach view text handlers
+  setTimeout(() => {
+    const viewButtons = vaultItemsContainer.querySelectorAll('.view-text');
+    viewButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const text = button.getAttribute('data-text');
+        const filename = button.getAttribute('data-filename');
+        alert(`📄 Extracted text from ${filename}:\n\n${text}`);
+      });
+    });
+  }, 100);
 }
 
 // Display error state

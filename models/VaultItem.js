@@ -16,7 +16,7 @@ const VaultItemSchema = new mongoose.Schema({
   },
   filePath: {
     type: String,
-    required: true
+    required: false // ✅ not required anymore
   },
   fileType: {
     type: String,

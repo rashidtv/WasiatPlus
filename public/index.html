@@ -6,59 +6,86 @@
   <title>WasiatPlus Vault</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="/style.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg">
+  <nav class="navbar navbar-expand-lg sticky-top shadow-sm">
     <div class="container">
-      <a class="navbar-brand" href="/">WasiatPlus Vault</a>
-      <div class="d-flex">
+      <a class="navbar-brand fw-bold text-white" href="#">WasiatPlus Vault</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav me-3">
+          <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="#cta">Get Started</a></li>
+        </ul>
         <a href="/login.html" class="btn btn-outline-light me-2">Login</a>
-        <a href="/register.html" class="btn btn-warning">Sign Up</a>
+        <a href="/register.html" class="btn btn-warning fw-bold">Sign Up</a>
       </div>
     </div>
   </nav>
 
   <!-- Hero Section -->
-  <section class="text-center py-5 bg-light">
+  <section class="hero d-flex align-items-center text-center text-white">
     <div class="container">
-      <h1 class="display-4 fw-bold mb-3">Your Wasiat - Will, Secured in the Cloud</h1>
-      <p class="lead mb-4">Upload grants, store them safely, and issue a digital vault card.</p>
-      <img src="https://cdn-icons-png.flaticon.com/512/2910/2910768.png" 
-           alt="Vault Image" class="img-fluid mb-4" style="max-width: 300px;">
-      <br>
-      <a href="/register.html" class="btn btn-lg btn-primary px-4">Get Started</a>
+      <h1 class="display-3 fw-bold">Secure Your Wasiat, For the Future</h1>
+      <p class="lead mt-3">Store your will & grants in a secure digital vault, accessible when it matters most.</p>
+      <img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" 
+           alt="Vault Illustration" class="img-fluid my-4" style="max-width: 320px;">
+      <div>
+        <a href="/register.html" class="btn btn-lg btn-warning px-5 shadow">Get Started</a>
+      </div>
     </div>
   </section>
 
   <!-- Features -->
-  <section class="py-5">
+  <section id="features" class="py-5">
     <div class="container text-center">
+      <h2 class="fw-bold mb-5">Why Choose WasiatPlus?</h2>
       <div class="row g-4">
         <div class="col-md-4">
-          <i class="bi bi-shield-lock display-4 text-primary"></i>
-          <h5 class="mt-3">Secure Storage</h5>
-          <p>Your files are encrypted and stored safely in the cloud.</p>
+          <div class="card h-100 p-4 border-0 shadow feature-card">
+            <i class="bi bi-shield-lock-fill display-3 text-primary"></i>
+            <h5 class="mt-3">Bank-Grade Security</h5>
+            <p>All documents are encrypted and protected with the latest technology.</p>
+          </div>
         </div>
         <div class="col-md-4">
-          <i class="bi bi-card-text display-4 text-success"></i>
-          <h5 class="mt-3">Digital Vault Card</h5>
-          <p>Assign a nominee and issue a secure digital card.</p>
+          <div class="card h-100 p-4 border-0 shadow feature-card">
+            <i class="bi bi-person-vcard-fill display-3 text-success"></i>
+            <h5 class="mt-3">Digital Vault Card</h5>
+            <p>Nominee gets access via a secure QR-linked vault card.</p>
+          </div>
         </div>
         <div class="col-md-4">
-          <i class="bi bi-cloud-arrow-up display-4 text-info"></i>
-          <h5 class="mt-3">Easy Upload</h5>
-          <p>Drag, drop, and upload your documents in seconds.</p>
+          <div class="card h-100 p-4 border-0 shadow feature-card">
+            <i class="bi bi-cloud-arrow-up-fill display-3 text-info"></i>
+            <h5 class="mt-3">Effortless Uploads</h5>
+            <p>Simply drag and drop your files, assign nominees, and you’re done.</p>
+          </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section id="cta" class="cta text-center text-white py-5">
+    <div class="container">
+      <h2 class="fw-bold mb-3">Ready to Protect Your Legacy?</h2>
+      <p class="mb-4">Join WasiatPlus today and safeguard your most important documents.</p>
+      <a href="/register.html" class="btn btn-lg btn-light px-5 shadow fw-bold">Start Now</a>
     </div>
   </section>
 
   <!-- Footer -->
   <footer class="footer bg-dark text-white py-3">
     <div class="container text-center">
-      &copy; 2025 WasiatPlus - All Rights Reserved
+      <small>&copy; 2025 WasiatPlus - All Rights Reserved</small>
     </div>
   </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

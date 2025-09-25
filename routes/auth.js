@@ -51,16 +51,21 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
+    console.log("🔑 Login attempt:", email); // log attempt
 
     try {
         // Find user
         const user = await User.findOne({ email });
+        console.log("👤 Found user:", user ? user.email : "not found");
+
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials.' });
         }
 
         // Check password
         const isMatch = await user.correctPassword(password, user.password);
+        console.log("🔒 Password match:", isMatch);
+
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials.' });
         }
@@ -79,10 +84,11 @@ router.post('/login', async (req, res) => {
         });
 
     } catch (err) {
-        console.error('Login error:', err);
+        console.error('🔥 Login error:', err);
         res.status(500).json({ message: 'Server error during login.' });
     }
 });
+
 
 // Get current user
 router.get('/user', auth, async (req, res) => {
