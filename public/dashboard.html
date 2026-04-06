@@ -1,31 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - WasiatPlus Vault</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <link href="/style.css" rel="stylesheet">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link href="/style.css" rel="stylesheet" />
 
   <style>
+    /* Hero strip */
     .hero-strip {
       width: 100%;
-      background: linear-gradient(90deg,#2c3e50,#4ca1af);
+      background: linear-gradient(90deg, #2c3e50, #4ca1af);
       color: #fff;
       text-align: center;
       padding: 1.5rem 0.75rem;
     }
 
+    /* Top-right menu */
     .top-menu {
       position: fixed;
       top: 12px;
       right: 12px;
       z-index: 9999;
     }
-    .dropdown-menu a { cursor: pointer; }
 
-    /* ----------- NEW CARD UI FOR VAULT ITEMS ----------- */
+    .dropdown-menu a {
+      cursor: pointer;
+    }
+
+    /* ----------- Modern Vault Card UI ----------- */
     .vault-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -36,7 +44,7 @@
       background: #ffffff;
       border-radius: 14px;
       padding: 16px;
-      box-shadow: 0px 3px 10px rgba(0,0,0,0.12);
+      box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.12);
       border-left: 6px solid #4a90e2;
     }
 
@@ -60,21 +68,37 @@
       font-weight: bold;
       display: inline-block;
       margin-top: 8px;
+      text-transform: capitalize;
     }
 
-    .badge.pending { background: #ffda79; color: #8a6d00; }
-    .badge.processing { background: #74b9ff; color: #0a3d62; }
-    .badge.completed { background: #55efc4; color: #006952; }
-    .badge.failed { background: #ff7675; color: #6e0000; }
+    .badge.pending {
+      background: #ffda79;
+      color: #8a6d00;
+    }
+
+    .badge.processing {
+      background: #74b9ff;
+      color: #0a3d62;
+    }
+
+    .badge.completed {
+      background: #55efc4;
+      color: #006952;
+    }
+
+    .badge.failed {
+      background: #ff7675;
+      color: #6e0000;
+    }
   </style>
 </head>
 
 <body class="bg-light">
 
-  <!-- Top-right dropdown -->
+  <!-- Top-right menu -->
   <div class="top-menu dropdown">
     <button class="btn btn-light dropdown-toggle shadow-sm" type="button" id="menuDropdown"
-            data-bs-toggle="dropdown" aria-expanded="false">
+      data-bs-toggle="dropdown" aria-expanded="false">
       <i class="bi bi-list"></i> Menu
     </button>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
@@ -92,7 +116,6 @@
   </header>
 
   <div class="container my-4">
-
     <!-- User Info -->
     <div class="card shadow-sm mb-4">
       <div class="card-body">
@@ -108,15 +131,13 @@
       </div>
       <div class="card-body">
         <form id="uploadForm" enctype="multipart/form-data">
-
           <div class="upload-area mb-3 text-center p-4 border rounded" id="uploadArea" style="cursor:pointer;">
             <i class="bi bi-cloud-arrow-up" style="font-size:2rem;color:#6c757d;"></i>
             <h6>Drag & drop your file here or click to browse</h6>
             <p class="text-muted">Supported: JPG, PNG, PDF, WEBP (Max 10MB)</p>
 
             <input class="form-control d-none" type="file" id="document" name="document"
-                   accept=".jpg,.jpeg,.png,.pdf,.webp"
-                   onchange="handleFileSelect(this)">
+              accept=".jpg,.jpeg,.png,.pdf,.webp" onchange="handleFileSelect(this)">
             <button type="button" class="btn btn-outline-primary mt-2" onclick="triggerFileInput()">Choose File</button>
           </div>
 
@@ -132,6 +153,7 @@
             <span class="spinner-border spinner-border-sm d-none" id="uploadSpinner"></span>
           </button>
         </form>
+
         <div id="uploadStatus" class="mt-3"></div>
       </div>
     </div>
@@ -143,30 +165,38 @@
       </div>
       <div class="card-body">
 
+        <!-- ✅ SEARCH + FILTER + COUNT -->
         <div class="d-flex justify-content-between align-items-center mb-3">
 
-  <div class="input-group w-50">
-    <input id="searchInput" type="text" class="form-control" placeholder="Search documents... (owner, text, keywords)">
-    <button class="btn btn-outline-secondary" onclick="loadVaultItems()">Search</button>
-  </div>
+          <!-- Search bar -->
+          <div class="input-group w-50">
+            <input id="searchInput" type="text" class="form-control" placeholder="Search documents... (text, owner, keywords)">
+            <button class="btn btn-outline-secondary" onclick="loadVaultItems()">Search</button>
+          </div>
 
-  <select id="statusFilter" class="form-select w-auto ms-2">
-    <option value="all">All</option>
-    <option value="pending">Pending</option>
-    <option value="processing">Processing</option>
-    <option value="completed">Completed</option>
-    <option value="failed">Failed</option>
-  </select>
+          <!-- Status filter -->
+          <select id="statusFilter" class="form-select w-auto ms-2">
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="completed">Completed</option>
+            <option value="failed">Failed</option>
+          </select>
 
-  <button class="btn btn-sm btn-outline-secondary ms-2" onclick="loadVaultItems()">
-    <i class="bi bi-arrow-clockwise"></i>
-  </button>
+          <!-- Items count -->
+          <span class="text-muted ms-3" id="itemsCount">Loading...</span>
 
-</div>
+          <!-- Refresh -->
+          <button class="btn btn-sm btn-outline-secondary ms-2" onclick="loadVaultItems()">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
 
+        </div>
+
+        <!-- Vault Items -->
         <div id="vaultItems">
           <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status"></div>
+            <div class="spinner-border text-primary"></div>
             <div class="text-muted mt-2">Loading documents...</div>
           </div>
         </div>
@@ -178,19 +208,20 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="./js/dashboard.js"></script>
+  <script src="/js/dashboard.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const logoutLink = document.getElementById('logoutLink');
-      logoutLink.addEventListener('click', (e) => {
+    document.addEventListener("DOMContentLoaded", () => {
+      const logoutLink = document.getElementById("logoutLink");
+      logoutLink.addEventListener("click", (e) => {
         e.preventDefault();
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login.html';
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login.html";
       });
     });
   </script>
 
 </body>
+
 </html>
