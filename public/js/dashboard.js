@@ -1,101 +1,39 @@
 console.log("✅ Dashboard JS Loaded");
 
-// Get token
 const token = localStorage.getItem("token");
 
 // Redirect if not logged in
-document.addEventListener("DOMContentLoaded", () => {
-    if (!token) {
-        window.location.href = "/login.html";
-        return;
-    }
-
-    loadUserInfo();
-    loadVaultItems();
-    initializeUploadHandler();
-
-    // Auto refresh vault items
-    setInterval(loadVaultItems, 3000);
-});
+if (!token) window.location.href = "/login.html";
 
 /* ============================================================
-   ✅ LOAD USER INFO
+   ✅ Load User Info
 ============================================================ */
 async function loadUserInfo() {
     try {
-        const response = await fetch("/api/auth/user", {
-            headers: { "Authorization": `Bearer ${token}` }
+        const res = await fetch("/api/auth/user", {
+            headers: { Authorization: `Bearer ${token}` }
         });
+        if (!res.ok) return;
 
-        if (response.ok) {
-            const user = await response.json();
-            const userInfo = document.getElementById("userInfo");
-            userInfo.innerHTML = `
-                <strong>Logged in as:</strong> ${user.username} (${user.email})<br>
-                <strong>Subscription Status:</strong> ${user.isSubscribed ? 'Active ✅' : 'Inactive ❌'}
-            `;
-        }
+        const user = await res.json();
+        document.getElementById("userInfo").innerHTML = `
+            <strong>Logged In As:</strong> ${user.username} (${user.email})<br>
+            <strong>Subscription:</strong> ${user.isSubscribed ? "Active ✅" : "Inactive ❌"}
+        `;
     } catch (err) {
         console.error("❌ Error loading user info:", err);
     }
 }
 
 /* ============================================================
-   ✅ UPLOAD HANDLER
-============================================================ */
-function initializeUploadHandler() {
-    const uploadForm = document.getElementById("uploadForm");
-    const fileInput = document.getElementById("document");
-
-    uploadForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const file = fileInput.files[0];
-        if (!file) {
-            showUploadStatus("❌ Please select a file first", "danger");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append("document", file);
-
-        setUploadLoading(true);
-        showUploadStatus("Uploading and processing document...", "info");
-
-        try {
-            const res = await fetch("/api/vault/upload", {
-                method: "POST",
-                headers: { "Authorization": `Bearer ${token}` },
-                body: formData
-            });
-
-            const data = await res.json();
-            if (res.ok && data.status === "success") {
-                showUploadStatus("✅ " + data.message, "success");
-                resetUploadForm();
-                loadVaultItems();
-            } else {
-                showUploadStatus("❌ " + (data.message || "Upload failed"), "danger");
-            }
-        } catch (err) {
-            console.error("❌ Upload error:", err);
-            showUploadStatus("❌ " + err.message, "danger");
-        } finally {
-            setUploadLoading(false);
-        }
-    });
-}
-
-/* ============================================================
-   ✅ LOAD VAULT ITEMS
+   ✅ Load Vault Items (search + filter enabled)
 ============================================================ */
 async function loadVaultItems() {
     const container = document.getElementById("vaultItems");
     const countLabel = document.getElementById("itemsCount");
-    
-    // ✅ Read search + filter values
-    const searchValue = document.getElementById("searchInput")?.value || "";
-    const statusValue = document.getElementById("statusFilter")?.value || "all";
+
+    const search = document.getElementById("searchInput").value;
+    const status = document.getElementById("statusFilter").value;
 
     container.innerHTML = `
         <div class="text-center py-4">
@@ -105,31 +43,17 @@ async function loadVaultItems() {
     `;
 
     try {
-        const url = `/api/vault/items?search=${encodeURIComponent(searchValue)}&status=${encodeURIComponent(statusValue)}`;
-
+        const url = `/api/vault/items?search=${encodeURIComponent(search)}&status=${status}`;
         const res = await fetch(url, {
-            headers: { "Authorization": `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` }
         });
 
         const items = await res.json();
-
-        // update count
         countLabel.textContent = `${items.length} document${items.length !== 1 ? "s" : ""}`;
 
-        if (items.length === 0) {
-            container.innerHTML = `
-                <div class="text-center py-4 text-muted">
-                    No documents uploaded yet.<br>
-                    <small>Upload a property grant document to begin.</small>
-                </div>
-            `;
-            return;
-        }
-
-        // Render cards
         container.innerHTML = `
             <div class="vault-grid">
-                ${items.map(createVaultCard).join("")}
+                ${items.map(buildCard).join("")}
             </div>
         `;
 
@@ -137,45 +61,32 @@ async function loadVaultItems() {
 
     } catch (err) {
         console.error("❌ Error fetching items:", err);
-        container.innerHTML = `
-            <div class="alert alert-danger">
-                Failed to load items. Please try again.
-            </div>
-        `;
+        container.innerHTML = `<div class="alert alert-danger">Failed to load items.</div>`;
     }
 }
 
 /* ============================================================
-   ✅ CARD TEMPLATE
+   ✅ Build Vault Card
 ============================================================ */
-function createVaultCard(item) {
-    const status = item.ocrStatus || "pending";
-    const badgeClass = status.toLowerCase();
-
+function buildCard(item) {
     const preview = item.extractedText
         ? escapeHtml(item.extractedText.substring(0, 120)) + "..."
         : "<em>Processing OCR...</em>";
 
-    const fileIcon = item.fileType.includes("pdf")
-        ? "file-earmark-pdf text-danger"
-        : "file-earmark-image text-primary";
-
     return `
         <div class="vault-card">
-            <h5><i class="bi bi-${fileIcon} me-1"></i> ${item.originalName}</h5>
-
+            <h5><i class="bi bi-file-earmark"></i> ${item.originalName}</h5>
             <div class="vault-meta">
                 Size: ${(item.fileSize / 1024).toFixed(1)} KB<br>
                 Uploaded: ${new Date(item.createdAt).toLocaleString()}
             </div>
 
-            <span class="badge ${badgeClass}">${status}</span>
+            <span class="badge ${item.ocrStatus}">${item.ocrStatus}</span>
 
             <p class="mt-2" style="font-size:14px;">${preview}</p>
 
-            <button 
-                class="btn btn-sm btn-outline-primary w-100 view-text"
-                data-text="${escapeHtml(item.extractedText || '')}"
+            <button class="btn btn-sm btn-outline-primary w-100 view-text"
+                data-text="${escapeHtml(item.extractedText || "")}"
                 data-filename="${item.originalName}">
                 <i class="bi bi-eye"></i> View Extracted Text
             </button>
@@ -183,50 +94,88 @@ function createVaultCard(item) {
     `;
 }
 
-/* ============================================================
-   ✅ Attach event listeners to "View Text" buttons
-============================================================ */
 function attachViewButtons() {
     document.querySelectorAll(".view-text").forEach(btn => {
         btn.addEventListener("click", () => {
-            const text = btn.getAttribute("data-text");
-            const file = btn.getAttribute("data-filename");
-
-            alert(`📄 Extracted text from ${file}:\n\n${text || "No text extracted yet."}`);
+            alert(`📄 Extracted text from ${btn.dataset.filename}:\n\n${btn.dataset.text || "No text available yet."}`);
         });
     });
 }
 
 /* ============================================================
-   ✅ Utility functions
+   ✅ Upload Handler
 ============================================================ */
-function showUploadStatus(message, type) {
-    const div = document.getElementById("uploadStatus");
-    div.innerHTML = `
-        <div class="alert alert-${type}">${message}</div>
-    `;
-}
+document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-function setUploadLoading(isLoading) {
+    const fileInput = document.getElementById("document");
+    const file = fileInput.files[0];
+
+    if (!file) {
+        showUploadStatus("❌ No file selected", "danger");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("document", file);
+
+    setUploadLoading(true);
+    showUploadStatus("Uploading & processing...", "info");
+
+    try {
+        const res = await fetch("/api/vault/upload", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            showUploadStatus("✅ File uploaded successfully!", "success");
+            clearFile();
+            loadVaultItems();
+        } else {
+            showUploadStatus("❌ Upload failed: " + data.message, "danger");
+        }
+    } catch (err) {
+        showUploadStatus("❌ Error: " + err.message, "danger");
+    }
+
+    setUploadLoading(false);
+});
+
+function setUploadLoading(loading) {
     const btn = document.getElementById("uploadButton");
     const spinner = document.getElementById("uploadSpinner");
 
-    btn.disabled = isLoading;
-
-    if (isLoading) {
-        spinner.classList.remove("d-none");
-        btn.innerHTML = "Processing...";
-    } else {
-        spinner.classList.add("d-none");
-        btn.innerHTML = 'Upload & Process Document';
-    }
+    btn.disabled = loading;
+    spinner.classList.toggle("d-none", !loading);
 }
 
-function resetUploadForm() {
-    document.getElementById("document").value = "";
+function showUploadStatus(msg, type) {
+    document.getElementById("uploadStatus").innerHTML = `
+        <div class="alert alert-${type}">${msg}</div>
+    `;
+}
+
+/* ============================================================
+   ✅ File Input Helpers
+============================================================ */
+function triggerFileInput() {
+    document.getElementById("document").click();
+}
+function handleFileSelect(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    document.getElementById("fileInfo").style.display = "block";
+    document.getElementById("fileName").textContent = file.name;
+    document.getElementById("fileSize").textContent = (file.size / 1024).toFixed(1) + " KB";
+}
+function clearFile() {
     document.getElementById("fileInfo").style.display = "none";
+    document.getElementById("document").value = "";
 }
-
 function escapeHtml(text) {
     const div = document.createElement("div");
     div.textContent = text;
@@ -234,35 +183,18 @@ function escapeHtml(text) {
 }
 
 /* ============================================================
-   ✅ File selection helpers
+   ✅ Auto-Refresh (Smart)
 ============================================================ */
-function triggerFileInput() {
-    document.getElementById("document").click();
-}
-
-function handleFileSelect(input) {
-    const file = input.files[0];
-    if (!file) return;
-
-    document.getElementById("fileName").textContent = file.name;
-    document.getElementById("fileSize").textContent = (file.size / 1024).toFixed(1) + " KB";
-    document.getElementById("fileInfo").style.display = "block";
-}
-
-function clearFile() {
-    resetUploadForm();
-}
-
-// Expose functions globally (used by HTML)
-window.triggerFileInput = triggerFileInput;
-window.handleFileSelect = handleFileSelect;
-window.clearFile = clearFile;
-
-
-document.getElementById("searchInput").addEventListener("keyup", () => {
-    loadVaultItems();
+let isTyping = false;
+document.getElementById("searchInput").addEventListener("input", () => {
+    isTyping = true;
+    setTimeout(() => (isTyping = false), 1500);
 });
 
-document.getElementById("statusFilter").addEventListener("change", () => {
-    loadVaultItems();
-});
+setInterval(() => {
+    if (!isTyping) loadVaultItems();
+}, 10000);
+
+/* INITIAL LOAD */
+loadUserInfo();
+loadVaultItems();
