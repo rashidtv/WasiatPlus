@@ -144,11 +144,25 @@
       <div class="card-body">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="text-muted" id="itemsCount">Loading...</span>
-          <button class="btn btn-sm btn-outline-secondary" onclick="loadVaultItems()">
-            <i class="bi bi-arrow-clockwise"></i> Refresh
-          </button>
-        </div>
+
+  <div class="input-group w-50">
+    <input id="searchInput" type="text" class="form-control" placeholder="Search documents... (owner, text, keywords)">
+    <button class="btn btn-outline-secondary" onclick="loadVaultItems()">Search</button>
+  </div>
+
+  <select id="statusFilter" class="form-select w-auto ms-2">
+    <option value="all">All</option>
+    <option value="pending">Pending</option>
+    <option value="processing">Processing</option>
+    <option value="completed">Completed</option>
+    <option value="failed">Failed</option>
+  </select>
+
+  <button class="btn btn-sm btn-outline-secondary ms-2" onclick="loadVaultItems()">
+    <i class="bi bi-arrow-clockwise"></i>
+  </button>
+
+</div>
 
         <div id="vaultItems">
           <div class="text-center py-4">

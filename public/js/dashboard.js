@@ -92,6 +92,10 @@ function initializeUploadHandler() {
 async function loadVaultItems() {
     const container = document.getElementById("vaultItems");
     const countLabel = document.getElementById("itemsCount");
+    
+    // ✅ Read search + filter values
+    const searchValue = document.getElementById("searchInput")?.value || "";
+    const statusValue = document.getElementById("statusFilter")?.value || "all";
 
     container.innerHTML = `
         <div class="text-center py-4">
@@ -101,7 +105,9 @@ async function loadVaultItems() {
     `;
 
     try {
-        const res = await fetch("/api/vault/items", {
+        const url = `/api/vault/items?search=${encodeURIComponent(searchValue)}&status=${encodeURIComponent(statusValue)}`;
+
+        const res = await fetch(url, {
             headers: { "Authorization": `Bearer ${token}` }
         });
 
@@ -251,3 +257,12 @@ function clearFile() {
 window.triggerFileInput = triggerFileInput;
 window.handleFileSelect = handleFileSelect;
 window.clearFile = clearFile;
+
+
+document.getElementById("searchInput").addEventListener("keyup", () => {
+    loadVaultItems();
+});
+
+document.getElementById("statusFilter").addEventListener("change", () => {
+    loadVaultItems();
+});

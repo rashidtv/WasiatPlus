@@ -113,10 +113,25 @@ In a production environment, this would contain actual text extracted from your 
 // @desc    Get user's vault items
 router.get('/items', auth, async (req, res) => {
   try {
-    const items = await VaultItem.find({ user: req.user.id })
+    const { search, status } = req.query;
+
+    const query = { user: req.user.id };
+
+    // ✅ Filter by status
+    if (status && status !== "all") {
+      query.ocrStatus = status;
+    }
+
+    // ✅ Search filter (text search)
+    if (search && search.trim() !== "") {
+      query.$text = { $search: search.trim() };
+    }
+
+    const items = await VaultItem.find(query)
       .sort({ createdAt: -1 });
 
     res.json(items);
+
   } catch (error) {
     console.error('Get items error:', error);
     res.status(500).json({ message: 'Server error fetching items' });
