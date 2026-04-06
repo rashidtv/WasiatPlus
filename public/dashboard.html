@@ -167,6 +167,34 @@
       window.location.href = '/login.html';
     });
   </script>
+<!-- NOMINEE MODAL -->
+<div class="modal fade" id="nomineeModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
 
+      <div class="modal-header">
+        <h5 class="modal-title">Manage Nominees</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div id="nomineeList">Loading...</div>
+
+        <hr>
+
+        <h6>Add New Nominee</h6>
+        <input id="nomineeName" class="form-control mb-2" placeholder="Full Name">
+        <input id="nomineeEmail" class="form-control mb-2" placeholder="Email">
+        <input id="nomineeRelationship" class="form-control mb-2" placeholder="Relationship">
+        <input id="nomineeShare" type="number" min="1" max="100" class="form-control mb-2" placeholder="Share Percentage">
+
+        <button class="btn btn-primary w-100 mt-2" id="addNomineeBtn">
+          <i class="bi bi-plus-circle"></i> Add Nominee
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
 </body>
 </html>

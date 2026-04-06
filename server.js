@@ -12,6 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+app.use("/api/nominee", require("./routes/nominee"));
 
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI;
