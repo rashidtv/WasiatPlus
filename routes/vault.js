@@ -4,6 +4,13 @@ const VaultItem = require('../models/VaultItem');
 const { upload, handleUploadError } = require('../middleware/upload');
 
 const router = express.Router();
+const {
+  extractOwnerName,
+  extractAddress,
+  extractSurveyNumber,
+  extractArea,
+  extractRegistrationDate
+} = require('../utils/extract');
 
 // @route   POST /api/vault/upload
 // @desc    Upload property grant document
@@ -88,9 +95,20 @@ Property Grant Document Analysis:
 This is a simulation of OCR text extraction. 
 In a production environment, this would contain actual text extracted from your property grant document.`;
 
-        item.extractedText = simulatedText;
-        item.isProcessed = true;
-        item.ocrStatus = 'completed';
+        // ✅ Extract Property Details using free REGEX parser
+const extracted = simulatedText;
+
+item.extractedText = extracted;
+item.propertyDetails = {
+  ownerName: extractOwnerName(extracted),
+  propertyAddress: extractAddress(extracted),
+  surveyNumber: extractSurveyNumber(extracted),
+  area: extractArea(extracted),
+  registrationDate: extractRegistrationDate(extracted)
+};
+
+item.isProcessed = true;
+item.ocrStatus = 'completed';
         
         await item.save();
         console.log('Simulated OCR completed for:', item.originalName);
